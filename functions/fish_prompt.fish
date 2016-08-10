@@ -1,8 +1,12 @@
-function __theme_afolwer_short_pwd
+function write_in_brackets
+  echo -n " ‹"$argv[1]"›"
+end
+
+function __theme_short_pwd
 	pwd | sed -e 's>'"$HOME"'>~>' | tr / \n | tac | head -n 3 | tac | tr \n / | sed -e 's/\/$//'
 end
 
-function __theme_afowler_git_prompt
+function __theme_git_prompt
 	set -l git_status (git status -z --porcelain 2>&1)
 	if test $status -eq 0
 		set -l raw_ref (command git symbolic-ref HEAD 2> /dev/null; or command git rev-parse --short HEAD 2> /dev/null)
@@ -25,18 +29,29 @@ function __theme_aws_role
   end
 end
 
+function __theme_vault_addr
+  set -l vault_addr ""
+  if [ ! -z "$VAULT_ADDR" ]
+    write_in_brackets $VAULT_ADDR
+  end
+end
+
 function fish_prompt
 	echo -n (hostname)
 	set_color --bold blue
 	echo -n " :: "
 	set_color normal
 	set_color green
-	echo -n (__theme_afolwer_short_pwd)
+	echo -n (__theme_short_pwd)
 	set_color yellow
-	__theme_afowler_git_prompt "‹" "›"
+	__theme_git_prompt "‹" "›"
   set_color purple
   __theme_aws_role
 	echo
 	set_color --bold blue
 	echo '» '
+end
+
+function fish_right_prompt
+  __theme_vault_addr
 end
