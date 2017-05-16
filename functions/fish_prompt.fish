@@ -16,6 +16,17 @@ function __theme_git_prompt
 	end
 end
 
+function __theme_terraform_env
+  set -l env_file .terraform/environment
+  if [ -e $env_file ]
+    set terraform_env (cat $env_file)
+  end
+
+  if [ ! -z "$terraform_env" ]
+    echo -n " ‹"$terraform_env"›"
+  end
+end
+
 function __theme_aws_role
   set -l config_file ~/.config/aws/last_assumed_role
   if [ ! -z "$AWS_ASSUMED_ROLE" ]
@@ -29,11 +40,8 @@ function __theme_aws_role
   end
 end
 
-function __theme_vault_addr
-  set -l vault_addr ""
-  if [ ! -z "$VAULT_ADDR" ]
-    write_in_brackets $VAULT_ADDR
-  end
+function __theme_hashiline
+  hashiline
 end
 
 function fish_prompt
@@ -45,6 +53,8 @@ function fish_prompt
 	echo -n (__theme_short_pwd)
 	set_color yellow
 	__theme_git_prompt "‹" "›"
+  set_color blue
+  __theme_terraform_env
   set_color purple
   __theme_aws_role
 	echo
@@ -53,5 +63,5 @@ function fish_prompt
 end
 
 function fish_right_prompt
-  __theme_vault_addr
+  __theme_hashiline
 end
