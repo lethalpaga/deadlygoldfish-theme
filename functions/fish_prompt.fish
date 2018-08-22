@@ -50,6 +50,27 @@ function __theme_aws_role
   end
 end
 
+function __theme_kubernetes
+  [ -z "$KUBECTL_PROMPT_ICON" ]; and set -l KUBECTL_PROMPT_ICON "⎈"
+  [ -z "$KUBECTL_PROMPT_SEPARATOR" ]; and set -l KUBECTL_PROMPT_SEPARATOR "/"
+  set -l config $KUBECONFIG
+  [ -z "$config" ]; and set -l config "$HOME/.kube/config"
+  if [ ! -f $config ]
+    echo (set_color red)$KUBECTL_PROMPT_ICON" "(set_color white)"no config"
+    return
+  end
+  set -l ctx (kubectl config current-context 2>/dev/null)
+  if [ $status -ne 0 ]
+    echo (set_color red)$KUBECTL_PROMPT_ICON" "(set_color white)"no context"
+    return
+  end
+
+  set -l ns (kubectl config view -o "jsonpath={.contexts[?(@.name==\"$context\")].context.namespace}")
+  [ -z $ns ]; and set -l KUBECTL_PROMPT_SEPARATOR ""
+
+  echo (set_color blue)$KUBECTL_PROMPT_ICON" "(set_color white)"$ctx$KUBECTL_PROMPT_SEPARATOR$ns"
+end
+
 function __theme_hashiline
   hashiline
 end
@@ -96,5 +117,7 @@ function fish_prompt
 end
 
 function fish_right_prompt
-  __theme_hashiline
+  set_color blue
+  __theme_kubernetes
+  set_color normal
 end
