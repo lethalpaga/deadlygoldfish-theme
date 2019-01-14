@@ -20,6 +20,10 @@ function __theme_git_prompt
     end
 end
 
+function __theme_date
+    echo -n "["(date '+%H:%M:%S')"]"
+end
+
 function __theme_aws_env
     if [ ! -z "$AWS_VAULT" ]
         echo -n " ‹"$AWS_VAULT"›"
@@ -103,17 +107,18 @@ end
 function __theme_prompt_char
     if test "$argv[1]" -eq 0
         set_color --bold blue
-        echo '» '
+        echo -n '» '
     else
         set_color --bold red
-        echo '✘ '
+        echo -n '✘ '
     end
 end
 
 function fish_prompt
     set -l last_status $status
 
-    echo -n (hostname)
+    set_color blue
+    __theme_date
     set_color --bold blue
     echo -n " :: "
     set_color normal
@@ -129,6 +134,7 @@ function fish_prompt
     __theme_aws_role
     echo
     __theme_prompt_char "$last_status"
+    set_color normal
 end
 
 function fish_right_prompt
